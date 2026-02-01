@@ -21,7 +21,7 @@ This is a minimal full-stack Next.js application with TypeScript and Tailwind CS
 4. Run `npm run dev` to start the application.
 
 ## Deployment Instructions
-Deploy to Vercel. Set necessary environment variables in Vercel secrets.
+Deploy to Railway. Set necessary environment variables in Railway secrets.
 
 ## Security Notes
 Do not store secrets in the repository.

@@ -6,7 +6,7 @@ import Stripe from 'stripe';
 import { prisma } from '../../../lib/prisma';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2023-10-16',
+  apiVersion: '2026-01-28.clover',
 });
 
 export const config = {
@@ -112,6 +112,9 @@ async function handleSubscriptionUpdate(subscription: Stripe.Subscription) {
   const quota = getQuotaForPrice(priceId);
   const tier = getTierForPrice(priceId);
 
+  // Type assertion for current_period_end which exists but may not be in types
+  const currentPeriodEnd = (subscription as any).current_period_end ?? 0;
+
   // Create or update subscription
   await prisma.subscription.upsert({
     where: { stripeSubscriptionId: subscription.id },
@@ -122,13 +125,13 @@ async function handleSubscriptionUpdate(subscription: Stripe.Subscription) {
       quota,
       used: 0,
       status: subscription.status,
-      currentPeriodEnd: new Date(subscription.current_period_end * 1000),
+      currentPeriodEnd: new Date(currentPeriodEnd * 1000),
     },
     update: {
       tier,
       quota,
       status: subscription.status,
-      currentPeriodEnd: new Date(subscription.current_period_end * 1000),
+      currentPeriodEnd: new Date(currentPeriodEnd * 1000),
     },
   });
 }
@@ -141,7 +144,7 @@ async function handleSubscriptionDeleted(subscription: Stripe.Subscription) {
 }
 
 async function handleInvoicePaymentSucceeded(invoice: Stripe.Invoice) {
-  const subscriptionId = invoice.subscription as string;
+  const subscriptionId = (invoice as any).subscription as string;
   
   if (!subscriptionId) return;
 

@@ -7,7 +7,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint . --ext .ts,.tsx",
-    "test": "jest"
+    "test": "jest",
+    "docker:build": "docker build -t uncensored-ai .",
+    "postinstall": "prisma generate"
   },
   "dependencies": {
     "next": "latest",

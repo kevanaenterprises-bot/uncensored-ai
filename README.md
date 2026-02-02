@@ -14,11 +14,14 @@ This is a full-stack Next.js application with TypeScript, Tailwind CSS, authenti
 
 ## Documentation
 
-- [API Documentation](docs/API.md) - Detailed API endpoint reference
+- [Installation Guide](docs/INSTALLATION.md) - **Step-by-step dependency installation**
 - [Development Guide](docs/DEVELOPMENT.md) - Local development setup
+- [API Documentation](docs/API.md) - Detailed API endpoint reference
 - [Deployment Guide](docs/DEPLOYMENT.md) - Production deployment instructions
 
 ## Quick Start
+
+> 📖 **New to this project?** See the [Installation Guide](docs/INSTALLATION.md) for detailed, step-by-step instructions for installing all dependencies.
 
 ### Prerequisites
 
@@ -35,6 +38,8 @@ This is a full-stack Next.js application with TypeScript, Tailwind CSS, authenti
    cd uncensored-ai
    npm install
    ```
+   
+   💡 **Having trouble?** Check the [Installation Guide](docs/INSTALLATION.md) for platform-specific instructions and troubleshooting.
 
 2. **Start local services:**
    ```bash

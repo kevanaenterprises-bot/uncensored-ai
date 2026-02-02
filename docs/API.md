@@ -1,0 +1,149 @@
+# API Documentation
+
+## Authentication
+
+### POST /api/auth/signin
+Authenticate a user with email and password credentials.
+
+**Request Body:**
+```json
+{
+  "email": "user@example.com",
+  "password": "securepassword"
+}
+```
+
+**Response:**
+```json
+{
+  "user": {
+    "id": "cuid123",
+    "email": "user@example.com",
+    "isAdmin": false
+  }
+}
+```
+
+## AI Assistant
+
+### POST /api/assistant
+Generate AI responses using OpenAI API with quota enforcement.
+
+**Headers:**
+- `Authorization`: NextAuth session cookie required
+
+**Request Body:**
+```json
+{
+  "prompt": "Your question or prompt here",
+  "maxTokens": 1000
+}
+```
+
+**Response (Success):**
+```json
+{
+  "response": "AI generated response",
+  "tokensUsed": 150,
+  "remaining": 850
+}
+```
+
+**Response (Quota Exceeded):**
+```json
+{
+  "error": "Insufficient quota. Remaining: 50, Required: 1000",
+  "remaining": 50
+}
+```
+
+**Status Codes:**
+- `200`: Success
+- `400`: Invalid request
+- `401`: Unauthorized (no session)
+- `403`: Forbidden (quota exceeded)
+- `500`: Server error
+
+## Stripe Integration
+
+### POST /api/stripe/webhook
+Handle Stripe webhook events for subscription management.
+
+**Headers:**
+- `stripe-signature`: Required for webhook verification
+
+**Supported Events:**
+- `checkout.session.completed`: Links user to Stripe customer
+- `customer.subscription.created`: Creates new subscription record
+- `customer.subscription.updated`: Updates subscription status/period
+- `customer.subscription.deleted`: Marks subscription as canceled
+- `invoice.payment_succeeded`: Resets usage quota for new billing period
+
+**Response:**
+```json
+{
+  "received": true
+}
+```
+
+## Admin Endpoints
+
+### POST /api/admin/override
+Allows admins to override subscription quotas and periods.
+
+**Headers:**
+- `Authorization`: Admin session required
+
+**Request Body:**
+```json
+{
+  "userId": "user_123",
+  "action": "increase_quota",
+  "value": 10000
+}
+```
+
+**Actions:**
+- `increase_quota`: Add tokens to quota (requires `value`)
+- `reset_quota`: Reset used tokens to 0
+- `extend_period`: Extend subscription period (requires `periodDays`)
+
+**Response:**
+```json
+{
+  "success": true,
+  "subscription": { /* updated subscription */ },
+  "message": "Successfully applied increase_quota for user user_123"
+}
+```
+
+**Status Codes:**
+- `200`: Success
+- `400`: Invalid request
+- `403`: Forbidden (not admin)
+- `404`: Subscription not found
+- `500`: Server error
+
+## Billing Quota System
+
+The quota system enforces token limits based on subscription tiers:
+
+### Quota Check Flow
+1. User makes API request
+2. System retrieves active subscription
+3. System checks:
+   - Subscription exists and is active
+   - Current period hasn't ended
+   - Remaining quota >= tokens required
+4. If allowed, processes request and updates usage
+5. Logs usage in `UsageLog` table
+
+### Subscription Tiers (Default)
+- **Basic**: 10,000 tokens/month
+- **Pro**: 50,000 tokens/month
+- **Premium**: 200,000 tokens/month
+
+### Quota Reset
+Quotas automatically reset to 0 used tokens when:
+- Stripe invoice payment succeeds (new billing period)
+- Admin manually resets via override endpoint

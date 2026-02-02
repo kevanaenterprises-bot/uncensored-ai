@@ -18,7 +18,9 @@
     "next-auth": "latest",
     "stripe": "latest",
     "pg": "latest",
-    "redis": "latest"
+    "redis": "latest",
+    "bcryptjs": "^2.4.3",
+    "micro": "^10.0.1"
   },
   "devDependencies": {
     "typescript": "latest",
@@ -29,6 +31,10 @@
     "@types/jest": "latest",
     "eslint": "latest",
     "eslint-config-prettier": "latest",
-    "eslint-plugin-prettier": "latest"
+    "eslint-plugin-prettier": "latest",
+    "@typescript-eslint/parser": "latest",
+    "@typescript-eslint/eslint-plugin": "latest",
+    "@types/bcryptjs": "^2.4.6",
+    "prettier": "latest"
   }
 }

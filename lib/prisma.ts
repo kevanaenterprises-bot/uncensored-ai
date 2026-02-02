@@ -3,6 +3,8 @@
 import { PrismaClient } from '@prisma/client';
 
 declare global {
+  // Using var for global augmentation is required by TypeScript
+  // to properly extend the NodeJS.Global namespace
   // eslint-disable-next-line no-var
   var prisma: PrismaClient | undefined;
 }

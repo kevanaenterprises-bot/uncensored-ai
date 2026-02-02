@@ -104,7 +104,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(200).json({
       response: completion,
       tokensUsed,
-      remaining: quotaCheck.remaining,
+      remaining: subscription ? (subscription.quota - subscription.used - tokensUsed) : 0,
     });
   } catch (error) {
     console.error('Assistant API error:', error);

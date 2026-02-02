@@ -154,23 +154,38 @@ async function handleInvoicePaymentSucceeded(invoice: Stripe.Invoice) {
 
 function getQuotaForPrice(priceId?: string): number {
   // Map price IDs to quotas
-  // TODO: Replace with actual price IDs from Stripe dashboard
+  // IMPORTANT: Replace these placeholder IDs with actual Stripe price IDs from your dashboard
   const quotaMap: Record<string, number> = {
     'price_basic': 10000,
     'price_pro': 50000,
     'price_premium': 200000,
   };
 
-  return quotaMap[priceId || ''] || 10000; // Default to basic
+  const quota = quotaMap[priceId || ''];
+  
+  // Validate that price IDs have been configured
+  if (!quota && priceId && !priceId.startsWith('price_')) {
+    console.error(`Unknown price ID: ${priceId}. Please configure in getQuotaForPrice()`);
+  }
+  
+  return quota || 10000; // Default to basic
 }
 
 function getTierForPrice(priceId?: string): string {
   // Map price IDs to tier names
+  // IMPORTANT: Replace these placeholder IDs with actual Stripe price IDs from your dashboard
   const tierMap: Record<string, string> = {
     'price_basic': 'basic',
     'price_pro': 'pro',
     'price_premium': 'premium',
   };
 
-  return tierMap[priceId || ''] || 'basic';
+  const tier = tierMap[priceId || ''];
+  
+  // Validate that price IDs have been configured
+  if (!tier && priceId && !priceId.startsWith('price_')) {
+    console.error(`Unknown price ID: ${priceId}. Please configure in getTierForPrice()`);
+  }
+  
+  return tier || 'basic';
 }

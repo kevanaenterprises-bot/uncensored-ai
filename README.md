@@ -1,5 +1,9 @@
 # Next.js Full-Stack Application
 
+[![CI](https://github.com/kevanaenterprises-bot/uncensored-ai/actions/workflows/ci.yml/badge.svg)](https://github.com/kevanaenterprises-bot/uncensored-ai/actions/workflows/ci.yml)
+[![Release](https://github.com/kevanaenterprises-bot/uncensored-ai/actions/workflows/release.yml/badge.svg)](https://github.com/kevanaenterprises-bot/uncensored-ai/actions/workflows/release.yml)
+[![Docker](https://github.com/kevanaenterprises-bot/uncensored-ai/actions/workflows/publish-ghcr.yml/badge.svg)](https://github.com/kevanaenterprises-bot/uncensored-ai/actions/workflows/publish-ghcr.yml)
+
 This is a full-stack Next.js application with TypeScript, Tailwind CSS, authentication, subscription billing, and AI integration.
 
 ## Features
@@ -17,7 +21,7 @@ This is a full-stack Next.js application with TypeScript, Tailwind CSS, authenti
 - [Installation Guide](docs/INSTALLATION.md) - **Step-by-step dependency installation**
 - [Development Guide](docs/DEVELOPMENT.md) - Local development setup
 - [API Documentation](docs/API.md) - Detailed API endpoint reference
-- [Deployment Guide](docs/DEPLOYMENT.md) - Production deployment instructions
+- [Deployment Guide](docs/DEPLOYMENT.md) - **Production deployment with Docker, GHCR, and Railway**
 
 ## Quick Start
 
@@ -116,8 +120,29 @@ uncensored-ai/
 - `npm start` - Start production server
 - `npm test` - Run tests
 - `npm run lint` - Run ESLint
+- `npm run docker:build` - Build Docker image locally
 
 ## Deployment
+
+### Docker Deployment
+
+The application includes a production-ready multi-stage Dockerfile:
+
+```bash
+# Build Docker image
+npm run docker:build
+
+# Or pull from GitHub Container Registry
+docker pull ghcr.io/kevanaenterprises-bot/uncensored-ai:latest
+
+# Run container
+docker run -d -p 3000:3000 \
+  -e DATABASE_URL="..." \
+  -e NEXTAUTH_SECRET="..." \
+  ghcr.io/kevanaenterprises-bot/uncensored-ai:latest
+```
+
+### Railway Deployment
 
 Deploy to Railway or any Node.js hosting platform. See [Deployment Guide](docs/DEPLOYMENT.md) for detailed instructions.
 

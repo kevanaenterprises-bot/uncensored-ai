@@ -1,5 +1,9 @@
 # Next.js Full-Stack Application
 
+[![CI](https://github.com/kevanaenterprises-bot/uncensored-ai/actions/workflows/ci.yml/badge.svg)](https://github.com/kevanaenterprises-bot/uncensored-ai/actions/workflows/ci.yml)
+[![Docker](https://github.com/kevanaenterprises-bot/uncensored-ai/actions/workflows/publish-ghcr.yml/badge.svg)](https://github.com/kevanaenterprises-bot/uncensored-ai/actions/workflows/publish-ghcr.yml)
+[![Release](https://github.com/kevanaenterprises-bot/uncensored-ai/actions/workflows/release.yml/badge.svg)](https://github.com/kevanaenterprises-bot/uncensored-ai/actions/workflows/release.yml)
+
 This is a full-stack Next.js application with TypeScript, Tailwind CSS, authentication, subscription billing, and AI integration.
 
 ## Features
@@ -119,7 +123,34 @@ uncensored-ai/
 
 ## Deployment
 
-Deploy to Railway or any Node.js hosting platform. See [Deployment Guide](docs/DEPLOYMENT.md) for detailed instructions.
+Multiple deployment options available:
+
+- **Docker + GHCR**: Containerized deployment with automatic image publishing
+- **Railway**: Easy platform deployment with managed PostgreSQL
+- **Vercel**: Serverless deployment (optional)
+
+See the comprehensive [Deployment Guide](docs/DEPLOYMENT.md) for:
+- Docker setup and production builds
+- GitHub Container Registry (GHCR) publishing
+- CI/CD with GitHub Actions
+- Automatic semantic versioning and releases
+- Environment configuration
+- Database migrations
+- Platform-specific instructions
+
+### Quick Docker Deploy
+
+```bash
+# Pull from GitHub Container Registry
+docker pull ghcr.io/kevanaenterprises-bot/uncensored-ai:latest
+
+# Run with your environment variables
+docker run -d -p 3000:3000 \
+  -e DATABASE_URL="postgresql://..." \
+  -e NEXTAUTH_SECRET="..." \
+  -e OPENAI_API_KEY="..." \
+  ghcr.io/kevanaenterprises-bot/uncensored-ai:latest
+```
 
 ### Quick Deploy to Railway
 

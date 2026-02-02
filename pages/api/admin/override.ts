@@ -64,7 +64,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         });
         break;
 
-      case 'extend_period':
+      case 'extend_period': {
         if (!periodDays || periodDays <= 0) {
           return res.status(400).json({ error: 'Invalid period days' });
         }
@@ -76,6 +76,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           data: { currentPeriodEnd: newPeriodEnd },
         });
         break;
+      }
 
       default:
         return res.status(400).json({ error: 'Invalid action' });

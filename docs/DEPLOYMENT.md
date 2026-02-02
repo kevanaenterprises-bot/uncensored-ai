@@ -453,7 +453,7 @@ This project includes three GitHub Actions workflows:
 #### 1. CI Workflow (`.github/workflows/ci.yml`)
 
 Runs on every push and pull request to `main`:
-- Sets up Node.js 18
+- Sets up Node.js 20
 - Installs dependencies with caching
 - Runs linter
 - Runs tests

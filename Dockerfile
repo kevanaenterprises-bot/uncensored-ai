@@ -1,20 +1,23 @@
 # Multi-stage production Dockerfile for Next.js application
 
 # Stage 1: Dependencies
-FROM node:18-alpine AS deps
-RUN apk add --no-cache libc6-compat
+FROM node:20-alpine AS deps
+RUN apk add --no-cache libc6-compat openssl
 WORKDIR /app
 
 # Copy package files
 COPY package*.json ./
+COPY prisma ./prisma/
 RUN npm ci --only=production
 
 # Stage 2: Builder
-FROM node:18-alpine AS builder
+FROM node:20-alpine AS builder
+RUN apk add --no-cache openssl
 WORKDIR /app
 
 # Copy package files and install all dependencies (including dev)
 COPY package*.json ./
+COPY prisma ./prisma/
 RUN npm ci
 
 # Copy application source
@@ -27,7 +30,8 @@ RUN npx prisma generate
 RUN npm run build
 
 # Stage 3: Runner (production)
-FROM node:18-alpine AS runner
+FROM node:20-alpine AS runner
+RUN apk add --no-cache openssl
 WORKDIR /app
 
 # Set production environment

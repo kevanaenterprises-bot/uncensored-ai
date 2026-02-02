@@ -29,7 +29,7 @@ This is a full-stack Next.js application with TypeScript, Tailwind CSS, authenti
 
 ### Prerequisites
 
-- Node.js 18+
+- Node.js 20+
 - Docker and Docker Compose
 - Stripe account (for billing)
 - OpenAI API key

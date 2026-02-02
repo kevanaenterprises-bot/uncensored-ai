@@ -155,6 +155,7 @@ async function handleInvoicePaymentSucceeded(invoice: Stripe.Invoice) {
 function getQuotaForPrice(priceId?: string): number {
   // Map price IDs to quotas
   // IMPORTANT: Replace these placeholder IDs with actual Stripe price IDs from your dashboard
+  // Real Stripe price IDs look like: price_1A2B3C4D5E6F7G8H9I0J
   const quotaMap: Record<string, number> = {
     'price_basic': 10000,
     'price_pro': 50000,
@@ -163,9 +164,9 @@ function getQuotaForPrice(priceId?: string): number {
 
   const quota = quotaMap[priceId || ''];
   
-  // Validate that price IDs have been configured
-  if (!quota && priceId && !priceId.startsWith('price_')) {
-    console.error(`Unknown price ID: ${priceId}. Please configure in getQuotaForPrice()`);
+  // Warn if placeholder IDs are still being used (they start with 'price_' followed by lowercase words)
+  if (priceId && priceId.match(/^price_[a-z]+$/)) {
+    console.warn(`Warning: Using placeholder price ID '${priceId}'. Replace with actual Stripe price ID for production.`);
   }
   
   return quota || 10000; // Default to basic
@@ -174,6 +175,7 @@ function getQuotaForPrice(priceId?: string): number {
 function getTierForPrice(priceId?: string): string {
   // Map price IDs to tier names
   // IMPORTANT: Replace these placeholder IDs with actual Stripe price IDs from your dashboard
+  // Real Stripe price IDs look like: price_1A2B3C4D5E6F7G8H9I0J
   const tierMap: Record<string, string> = {
     'price_basic': 'basic',
     'price_pro': 'pro',
@@ -182,9 +184,9 @@ function getTierForPrice(priceId?: string): string {
 
   const tier = tierMap[priceId || ''];
   
-  // Validate that price IDs have been configured
-  if (!tier && priceId && !priceId.startsWith('price_')) {
-    console.error(`Unknown price ID: ${priceId}. Please configure in getTierForPrice()`);
+  // Warn if placeholder IDs are still being used (they start with 'price_' followed by lowercase words)
+  if (priceId && priceId.match(/^price_[a-z]+$/)) {
+    console.warn(`Warning: Using placeholder price ID '${priceId}'. Replace with actual Stripe price ID for production.`);
   }
   
   return tier || 'basic';

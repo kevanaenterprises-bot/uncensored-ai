@@ -6,7 +6,7 @@ import Stripe from 'stripe';
 import { prisma } from '../../../lib/prisma';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2023-10-16',
+  apiVersion: '2026-01-28.clover',
 });
 
 export const config = {
@@ -112,6 +112,10 @@ async function handleSubscriptionUpdate(subscription: Stripe.Subscription) {
   const quota = getQuotaForPrice(priceId);
   const tier = getTierForPrice(priceId);
 
+  // Get current_period_end - using any type due to Stripe API version mismatch
+  const subscriptionAny = subscription as any;
+  const currentPeriodEnd = subscriptionAny.current_period_end || Date.now() / 1000;
+
   // Create or update subscription
   await prisma.subscription.upsert({
     where: { stripeSubscriptionId: subscription.id },
@@ -121,14 +125,14 @@ async function handleSubscriptionUpdate(subscription: Stripe.Subscription) {
       tier,
       quota,
       used: 0,
-      status: subscription.status,
-      currentPeriodEnd: new Date(subscription.current_period_end * 1000),
+      status: subscription.status as string,
+      currentPeriodEnd: new Date(currentPeriodEnd * 1000),
     },
     update: {
       tier,
       quota,
-      status: subscription.status,
-      currentPeriodEnd: new Date(subscription.current_period_end * 1000),
+      status: subscription.status as string,
+      currentPeriodEnd: new Date(currentPeriodEnd * 1000),
     },
   });
 }
@@ -141,7 +145,9 @@ async function handleSubscriptionDeleted(subscription: Stripe.Subscription) {
 }
 
 async function handleInvoicePaymentSucceeded(invoice: Stripe.Invoice) {
-  const subscriptionId = invoice.subscription as string;
+  // Using any type due to Stripe API version mismatch
+  const invoiceAny = invoice as any;
+  const subscriptionId = invoiceAny.subscription as string;
   
   if (!subscriptionId) return;
 

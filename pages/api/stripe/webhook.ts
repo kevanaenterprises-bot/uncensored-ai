@@ -113,6 +113,8 @@ async function handleSubscriptionUpdate(subscription: Stripe.Subscription) {
   const tier = getTierForPrice(priceId);
 
   // Create or update subscription
+  // Note: Using type assertions due to Stripe API version type incompatibilities
+  // The properties exist at runtime but types don't match the latest API version
   await prisma.subscription.upsert({
     where: { stripeSubscriptionId: subscription.id },
     create: {
@@ -141,6 +143,7 @@ async function handleSubscriptionDeleted(subscription: Stripe.Subscription) {
 }
 
 async function handleInvoicePaymentSucceeded(invoice: Stripe.Invoice) {
+  // Note: Using type assertion due to Stripe API version type incompatibilities
   const subscriptionId = (invoice as any).subscription as string;
   
   if (!subscriptionId) return;

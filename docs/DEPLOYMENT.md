@@ -135,9 +135,7 @@ git commit -m "feat: add new AI model support"
 git commit -m "fix: resolve authentication bug"
 
 # Create a breaking change (major version bump)
-git commit -m "feat!: redesign API endpoints
-
-BREAKING CHANGE: API endpoints have been restructured"
+git commit -m "feat!: redesign API endpoints" -m "BREAKING CHANGE: API endpoints have been restructured"
 
 # Push to main (triggers automatic release)
 git push origin main

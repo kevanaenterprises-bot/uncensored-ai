@@ -7,34 +7,37 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint . --ext .ts,.tsx",
-    "test": "jest"
+    "test": "jest",
+    "docker:build": "docker build -t uncensored-ai .",
+    "postinstall": "prisma generate || true"
   },
   "dependencies": {
+    "@prisma/client": "^5.0.0",
+    "bcryptjs": "^2.4.3",
+    "micro": "^10.0.1",
     "next": "latest",
+    "next-auth": "latest",
+    "pg": "latest",
     "react": "latest",
     "react-dom": "latest",
-    "tailwindcss": "latest",
-    "@prisma/client": "latest",
-    "next-auth": "latest",
-    "stripe": "latest",
-    "pg": "latest",
     "redis": "latest",
-    "bcryptjs": "^2.4.3",
-    "micro": "^10.0.1"
+    "stripe": "latest",
+    "tailwindcss": "latest"
   },
   "devDependencies": {
-    "typescript": "latest",
-    "@types/react": "latest",
-    "@types/node": "latest",
-    "jest": "latest",
-    "ts-jest": "latest",
+    "@types/bcryptjs": "^2.4.6",
     "@types/jest": "latest",
-    "eslint": "latest",
+    "@types/node": "latest",
+    "@types/react": "latest",
+    "@typescript-eslint/eslint-plugin": "latest",
+    "@typescript-eslint/parser": "latest",
+    "eslint": "^8.57.1",
     "eslint-config-prettier": "latest",
     "eslint-plugin-prettier": "latest",
-    "@typescript-eslint/parser": "latest",
-    "@typescript-eslint/eslint-plugin": "latest",
-    "@types/bcryptjs": "^2.4.6",
-    "prettier": "latest"
+    "jest": "latest",
+    "prettier": "latest",
+    "prisma": "^5.0.0",
+    "ts-jest": "latest",
+    "typescript": "latest"
   }
 }

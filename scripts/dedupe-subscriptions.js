@@ -7,13 +7,13 @@ const prisma = new PrismaClient();
 
 async function main() {
   console.log('Scanning for duplicate stripeSubscriptionId entries...');
-  const duplicates = await prisma.$queryRawUnsafe(`
+  const duplicates = await prisma.$queryRaw`
     SELECT "stripeSubscriptionId", COUNT(*) AS cnt, array_agg(id) AS ids
     FROM "Subscription"
     WHERE stripeSubscriptionId IS NOT NULL
     GROUP BY "stripeSubscriptionId"
     HAVING COUNT(*) > 1;
-  `);
+  `;
 
   if (!duplicates || duplicates.length === 0) {
     console.log('No duplicates found. Safe to migrate.');

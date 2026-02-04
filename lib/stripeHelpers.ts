@@ -8,7 +8,6 @@ export function getSubscriptionCurrentPeriodEnd(subscription: any): number {
     subscription?.current_period_end,
     subscription?.currentPeriodEnd,
     subscription?.current_period_end_at,
-    subscription?.current_period_end || 0,
   ];
 
   for (const c of candidates) {

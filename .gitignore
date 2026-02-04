@@ -53,3 +53,4 @@ prisma/migrations/**/migration.sql
 
 # OS
 Thumbs.db
+.push-trigger

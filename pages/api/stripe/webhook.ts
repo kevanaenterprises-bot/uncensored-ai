@@ -4,6 +4,7 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import { buffer } from 'micro';
 import Stripe from 'stripe';
 import { prisma } from '../../../lib/prisma';
+import { getSubscriptionCurrentPeriodEnd, getInvoiceSubscriptionId } from '../../../lib/stripeHelpers';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: '2023-10-16',
@@ -112,6 +113,10 @@ async function handleSubscriptionUpdate(subscription: Stripe.Subscription) {
   const quota = getQuotaForPrice(priceId);
   const tier = getTierForPrice(priceId);
 
+  // Use helper to safely get current_period_end and convert to Date
+  const currentPeriodEndUnix = getSubscriptionCurrentPeriodEnd(subscription);
+  const currentPeriodEnd = new Date(currentPeriodEndUnix * 1000);
+
   // Create or update subscription
   await prisma.subscription.upsert({
     where: { stripeSubscriptionId: subscription.id },
@@ -122,13 +127,13 @@ async function handleSubscriptionUpdate(subscription: Stripe.Subscription) {
       quota,
       used: 0,
       status: subscription.status,
-      currentPeriodEnd: new Date(subscription.current_period_end * 1000),
+      currentPeriodEnd,
     },
     update: {
       tier,
       quota,
       status: subscription.status,
-      currentPeriodEnd: new Date(subscription.current_period_end * 1000),
+      currentPeriodEnd,
     },
   });
 }
@@ -141,7 +146,8 @@ async function handleSubscriptionDeleted(subscription: Stripe.Subscription) {
 }
 
 async function handleInvoicePaymentSucceeded(invoice: Stripe.Invoice) {
-  const subscriptionId = invoice.subscription as string;
+  // Use helper to safely extract subscription ID (can be string or object)
+  const subscriptionId = getInvoiceSubscriptionId(invoice);
   
   if (!subscriptionId) return;
 

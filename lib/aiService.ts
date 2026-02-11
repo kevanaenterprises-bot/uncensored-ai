@@ -64,12 +64,25 @@ export class AIService {
       });
 
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
+        let errorData;
+        try {
+          errorData = await response.json();
+        } catch (parseError) {
+          console.error(`Failed to parse error response from ${this.provider}:`, parseError);
+          errorData = { status: response.status, statusText: response.statusText };
+        }
         console.error(`${this.provider} API error:`, errorData);
-        throw new Error(`Failed to generate response from ${this.provider}`);
+        throw new Error(`Failed to generate response from ${this.provider}: ${response.status} ${response.statusText}`);
       }
 
       const data = await response.json();
+      
+      // Validate response structure
+      if (!data.choices || !Array.isArray(data.choices) || data.choices.length === 0) {
+        console.error(`Invalid response structure from ${this.provider}:`, data);
+        throw new Error(`Invalid response structure from ${this.provider} API`);
+      }
+      
       const content = data.choices[0]?.message?.content || '';
       const tokensUsed = data.usage?.total_tokens || 0;
 
@@ -94,7 +107,14 @@ export class AIService {
 
 // Factory function to create AI service based on environment config
 export function createAIService(): AIService {
-  const provider = (process.env.AI_PROVIDER || 'venice') as 'openai' | 'venice';
+  const providerEnv = process.env.AI_PROVIDER || 'venice';
+  
+  // Validate provider value
+  if (providerEnv !== 'openai' && providerEnv !== 'venice') {
+    throw new Error(`Invalid AI_PROVIDER: '${providerEnv}'. Must be 'openai' or 'venice'.`);
+  }
+  
+  const provider = providerEnv as 'openai' | 'venice';
   
   let apiKey: string;
   let model: string | undefined;

@@ -3,7 +3,8 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { getSession } from 'next-auth/react';
 import { prisma } from '../../lib/prisma';
-import { checkQuota, updateUsage } from '../../lib/billingQuota';
+import { checkQuota } from '../../lib/billingQuota';
+import { createAIService } from '../../lib/aiService';
 
 interface AssistantRequest {
   prompt: string;
@@ -55,34 +56,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       });
     }
 
-    // Call OpenAI API
-    const openaiResponse = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
-      },
-      body: JSON.stringify({
-        model: 'gpt-3.5-turbo',
-        messages: [
-          {
-            role: 'user',
-            content: prompt,
-          },
-        ],
-        max_tokens: maxTokens,
-      }),
-    });
-
-    if (!openaiResponse.ok) {
-      const error = await openaiResponse.json();
-      console.error('OpenAI API error:', error);
-      return res.status(500).json({ error: 'Failed to generate response' });
-    }
-
-    const data = await openaiResponse.json();
-    const completion = data.choices[0]?.message?.content;
-    const tokensUsed = data.usage?.total_tokens || 0;
+    // Create AI service and generate completion
+    const aiService = createAIService();
+    const { content, tokensUsed } = await aiService.generateCompletion(prompt, maxTokens);
 
     // Update usage in database
     if (subscription) {
@@ -102,9 +78,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     });
 
     return res.status(200).json({
-      response: completion,
+      response: content,
       tokensUsed,
       remaining: subscription ? (subscription.quota - subscription.used - tokensUsed) : 0,
+      provider: aiService.getProviderName(),
+      model: aiService.getModel(),
     });
   } catch (error) {
     console.error('Assistant API error:', error);

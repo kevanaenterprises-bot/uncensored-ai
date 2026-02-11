@@ -27,7 +27,13 @@ Authenticate a user with email and password credentials.
 ## AI Assistant
 
 ### POST /api/assistant
-Generate AI responses using OpenAI API with quota enforcement.
+Generate AI responses using Venice.ai or OpenAI with quota enforcement.
+
+**Supported Providers:**
+- Venice.ai (default) - Privacy-focused uncensored AI models (Llama 3.3 70B, etc.)
+- OpenAI - GPT-3.5 Turbo and other OpenAI models
+
+Configure the provider using the `AI_PROVIDER` environment variable.
 
 **Headers:**
 - `Authorization`: NextAuth session cookie required
@@ -45,7 +51,9 @@ Generate AI responses using OpenAI API with quota enforcement.
 {
   "response": "AI generated response",
   "tokensUsed": 150,
-  "remaining": 850
+  "remaining": 850,
+  "provider": "venice",
+  "model": "llama-3.3-70b"
 }
 ```
 

@@ -6,7 +6,7 @@ This is a full-stack Next.js application with TypeScript, Tailwind CSS, authenti
 
 - 🔐 **Authentication**: Secure email/password authentication with NextAuth.js
 - 💳 **Subscription Billing**: Stripe integration with multiple tiers
-- 🤖 **AI Integration**: OpenAI API integration with quota management
+- 🤖 **AI Integration**: Support for both OpenAI and Venice.ai with quota management
 - 📊 **Usage Tracking**: Track token usage and enforce billing quotas
 - 👥 **Admin Panel**: Admin tools for quota overrides and user management
 - 🗄️ **Database**: PostgreSQL with Prisma ORM
@@ -28,7 +28,7 @@ This is a full-stack Next.js application with TypeScript, Tailwind CSS, authenti
 - Node.js 18+
 - Docker and Docker Compose
 - Stripe account (for billing)
-- OpenAI API key
+- AI Provider API key (Venice.ai or OpenAI)
 
 ### Setup
 
@@ -67,16 +67,57 @@ Visit `http://localhost:3000` to see the application.
 
 ## Environment Variables
 
+### Core Configuration
 - `DATABASE_URL`: PostgreSQL connection string
 - `NEXTAUTH_SECRET`: Secret for NextAuth (generate with: `openssl rand -base64 32`)
 - `NEXTAUTH_URL`: Application URL
-- `OPENAI_API_KEY`: OpenAI API key
-- `STRIPE_SECRET_KEY`: Stripe secret key
-- `STRIPE_WEBHOOK_SECRET`: Stripe webhook secret
-- `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`: Stripe publishable key
 - `REDIS_URL`: Redis connection string (optional)
 - `ADMIN_EMAIL`: Admin email
 - `ADMIN_PASSWORD`: Admin password
+
+### AI Provider Configuration
+- `AI_PROVIDER`: AI provider to use (`venice` or `openai`, default: `venice`)
+- `VENICE_API_KEY`: Venice.ai API key (required if using Venice.ai)
+- `VENICE_MODEL`: Venice.ai model name (default: `llama-3.3-70b`)
+- `OPENAI_API_KEY`: OpenAI API key (required if using OpenAI)
+
+### Stripe Configuration
+- `STRIPE_SECRET_KEY`: Stripe secret key
+- `STRIPE_WEBHOOK_SECRET`: Stripe webhook secret
+- `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`: Stripe publishable key
+
+## AI Provider Configuration
+
+This application supports two AI providers: **Venice.ai** (default) and **OpenAI**.
+
+### Using Venice.ai (Recommended)
+
+Venice.ai provides privacy-focused, uncensored AI models including Llama 3.3 70B and other open-source models.
+
+1. Get your API key from [Venice.ai Settings](https://venice.ai/settings/api)
+2. Set environment variables:
+   ```bash
+   AI_PROVIDER=venice
+   VENICE_API_KEY=your-venice-api-key
+   VENICE_MODEL=llama-3.3-70b  # Optional, this is the default
+   ```
+
+**Available Venice.ai Models:**
+- `llama-3.3-70b` (default)
+- `llama-3.2-3b`
+- `hermes-3-llama-3.1-405b`
+- And more - check [Venice.ai documentation](https://docs.venice.ai)
+
+### Using OpenAI
+
+1. Get your API key from [OpenAI Platform](https://platform.openai.com/api-keys)
+2. Set environment variables:
+   ```bash
+   AI_PROVIDER=openai
+   OPENAI_API_KEY=sk-your-openai-api-key
+   ```
+
+The application will automatically route requests to the configured provider.
 
 ## Technology Stack
 
@@ -87,7 +128,7 @@ Visit `http://localhost:3000` to see the application.
 - **ORM**: Prisma
 - **Authentication**: NextAuth.js
 - **Payment**: Stripe
-- **AI**: OpenAI API
+- **AI**: Venice.ai (default) or OpenAI API
 - **Testing**: Jest
 - **Linting**: ESLint
 

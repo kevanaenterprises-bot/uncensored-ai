@@ -161,14 +161,30 @@ describe('AIService', () => {
         await expect(service.generateCompletion('Test prompt')).rejects.toThrow(
           ServiceUnavailableError
         );
-        
+      });
+
+      it('should include error details in ServiceUnavailableError', async () => {
+        (global.fetch as jest.Mock).mockResolvedValueOnce({
+          ok: false,
+          status: 403,
+          statusText: 'Forbidden',
+          json: async () => ({ error: 'Quota exceeded' }),
+        });
+
+        const service = new AIService({
+          provider: 'openai',
+          apiKey: 'test-key',
+        });
+
         try {
           await service.generateCompletion('Test prompt');
+          fail('Should have thrown ServiceUnavailableError');
         } catch (error) {
+          expect(error).toBeInstanceOf(ServiceUnavailableError);
           if (error instanceof ServiceUnavailableError) {
-            expect(error.statusCode).toBe(401);
-            expect(error.statusText).toBe('Unauthorized');
-            expect(error.provider).toBe('venice');
+            expect(error.statusCode).toBe(403);
+            expect(error.statusText).toBe('Forbidden');
+            expect(error.provider).toBe('openai');
           }
         }
       });

@@ -68,8 +68,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     try {
       response = await aiService.generateCompletion(prompt, maxTokens);
     } catch (error: any) {
-      console.error('AI generation error:', error);
-      
       // Use instanceof to check error types for robust error handling
       if (error instanceof InvalidResponseError) {
         return res.status(502).json({ error: 'AI service returned invalid response' });
@@ -79,6 +77,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         return res.status(500).json({ error: 'AI service configuration error' });
       }
       
+      // Log only unexpected errors (custom errors are already logged at source)
+      console.error('Unexpected AI generation error:', error);
       return res.status(500).json({ error: 'Internal server error' });
     }
     

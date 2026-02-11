@@ -67,7 +67,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     let response;
     try {
       response = await aiService.generateCompletion(prompt, maxTokens);
-    } catch (error: any) {
+    } catch (error: unknown) {
       // Use instanceof to check error types for robust error handling
       if (error instanceof InvalidResponseError) {
         return res.status(502).json({ error: 'AI service returned invalid response' });

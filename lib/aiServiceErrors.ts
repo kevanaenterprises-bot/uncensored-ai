@@ -1,5 +1,9 @@
 // lib/aiServiceErrors.ts
 
+// Note: Object.setPrototypeOf is necessary for proper instanceof checks when extending Error
+// This is the official TypeScript/MDN recommended approach for ES5/ES6 compatibility
+// See: https://www.typescriptlang.org/docs/handbook/release-notes/typescript-2-2.html#support-for-newtarget
+
 export class AIServiceError extends Error {
   constructor(message: string, public provider: string) {
     super(message);

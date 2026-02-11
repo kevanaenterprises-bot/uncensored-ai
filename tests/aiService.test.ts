@@ -176,17 +176,19 @@ describe('AIService', () => {
           apiKey: 'test-key',
         });
 
-        try {
-          await service.generateCompletion('Test prompt');
-          fail('Should have thrown ServiceUnavailableError');
-        } catch (error) {
+        await expect(service.generateCompletion('Test prompt'))
+          .rejects
+          .toThrow(ServiceUnavailableError);
+        
+        // Validate error properties
+        await service.generateCompletion('Test prompt').catch((error) => {
           expect(error).toBeInstanceOf(ServiceUnavailableError);
           if (error instanceof ServiceUnavailableError) {
             expect(error.statusCode).toBe(403);
             expect(error.statusText).toBe('Forbidden');
             expect(error.provider).toBe('openai');
           }
-        }
+        });
       });
 
       it('should throw InvalidResponseError on invalid response structure', async () => {

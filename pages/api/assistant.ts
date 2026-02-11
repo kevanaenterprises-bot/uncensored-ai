@@ -58,7 +58,26 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     // Create AI service and generate completion
     const aiService = createAIService();
-    const { content, tokensUsed } = await aiService.generateCompletion(prompt, maxTokens);
+    
+    let response;
+    try {
+      response = await aiService.generateCompletion(prompt, maxTokens);
+    } catch (error: any) {
+      console.error('AI generation error:', error);
+      
+      // Provide more specific error messages based on error type
+      if (error.message?.includes('Invalid response structure')) {
+        return res.status(502).json({ error: 'AI service returned invalid response' });
+      } else if (error.message?.includes('Failed to generate response')) {
+        return res.status(502).json({ error: 'AI service is temporarily unavailable' });
+      } else if (error.message?.includes('API_KEY')) {
+        return res.status(500).json({ error: 'AI service configuration error' });
+      }
+      
+      return res.status(500).json({ error: 'Internal server error' });
+    }
+    
+    const { content, tokensUsed } = response;
 
     // Update usage in database
     if (subscription) {

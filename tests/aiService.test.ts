@@ -183,6 +183,92 @@ describe('AIService', () => {
           'Failed to generate response from openai: 500 Internal Server Error'
         );
       });
+
+      it('should handle missing message or content in response', async () => {
+        const mockResponse = {
+          choices: [
+            {
+              message: {}, // Missing content
+            },
+          ],
+          usage: {
+            total_tokens: 10,
+          },
+        };
+
+        (global.fetch as jest.Mock).mockResolvedValueOnce({
+          ok: true,
+          json: async () => mockResponse,
+        });
+
+        const service = new AIService({
+          provider: 'venice',
+          apiKey: 'test-key',
+        });
+
+        const result = await service.generateCompletion('Test prompt');
+        
+        // Should return empty string when content is missing
+        expect(result.content).toBe('');
+        expect(result.tokensUsed).toBe(10);
+      });
+
+      it('should handle missing usage field in response', async () => {
+        const mockResponse = {
+          choices: [
+            {
+              message: {
+                content: 'Response with no usage data',
+              },
+            },
+          ],
+          // Missing usage field
+        };
+
+        (global.fetch as jest.Mock).mockResolvedValueOnce({
+          ok: true,
+          json: async () => mockResponse,
+        });
+
+        const service = new AIService({
+          provider: 'openai',
+          apiKey: 'test-key',
+        });
+
+        const result = await service.generateCompletion('Test prompt');
+        
+        expect(result.content).toBe('Response with no usage data');
+        // Should default to 0 when usage is missing
+        expect(result.tokensUsed).toBe(0);
+      });
+
+      it('should handle undefined total_tokens in usage', async () => {
+        const mockResponse = {
+          choices: [
+            {
+              message: {
+                content: 'Test response',
+              },
+            },
+          ],
+          usage: {}, // usage exists but total_tokens is missing
+        };
+
+        (global.fetch as jest.Mock).mockResolvedValueOnce({
+          ok: true,
+          json: async () => mockResponse,
+        });
+
+        const service = new AIService({
+          provider: 'venice',
+          apiKey: 'test-key',
+        });
+
+        const result = await service.generateCompletion('Test prompt');
+        
+        expect(result.content).toBe('Test response');
+        expect(result.tokensUsed).toBe(0);
+      });
     });
   });
 

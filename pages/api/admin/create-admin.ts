@@ -32,8 +32,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       });
     }
 
-    // Hash the password
-    const passwordHash = await hash(adminPassword, 10);
+    // Hash the password with bcrypt cost factor 12 for enhanced security
+    const passwordHash = await hash(adminPassword, 12);
 
     // Create admin user
     const admin = await prisma.user.create({

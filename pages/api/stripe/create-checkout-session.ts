@@ -55,7 +55,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     // Warn if using placeholder IDs
     // Real Stripe price IDs follow the pattern: price_<24+ alphanumeric characters>
     // Placeholder IDs are just: price_<descriptive_name>
-    if (priceId && priceId.startsWith('price_') && !priceId.match(/^price_[0-9A-Za-z]{24,}$/)) {
+    if (!priceId.match(/^price_[0-9A-Za-z]{24,}$/)) {
       console.warn(`Warning: Using placeholder price ID '${priceId}'. Replace with actual Stripe price ID for production.`);
     }
 

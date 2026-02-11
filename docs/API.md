@@ -66,6 +66,53 @@ Generate AI responses using OpenAI API with quota enforcement.
 
 ## Stripe Integration
 
+### POST /api/stripe/create-checkout-session
+Create a Stripe Checkout session for subscription purchase.
+
+**Headers:**
+- `Authorization`: NextAuth session cookie required
+
+**Request Body:**
+```json
+{
+  "tier": "basic"
+}
+```
+
+**Supported Tiers:**
+- `basic`: 10,000 tokens/month
+- `pro`: 50,000 tokens/month
+- `premium`: 200,000 tokens/month
+
+**Response (Success):**
+```json
+{
+  "sessionId": "cs_test_123...",
+  "url": "https://checkout.stripe.com/pay/cs_test_123..."
+}
+```
+
+**Response (Unauthorized):**
+```json
+{
+  "error": "Unauthorized"
+}
+```
+
+**Response (Invalid Tier):**
+```json
+{
+  "error": "Invalid tier. Must be one of: basic, pro, premium"
+}
+```
+
+**Status Codes:**
+- `200`: Checkout session created successfully
+- `400`: Invalid request or Stripe error
+- `401`: Unauthorized (no session)
+- `405`: Method not allowed (only POST)
+- `500`: Server error
+
 ### POST /api/stripe/webhook
 Handle Stripe webhook events for subscription management.
 
@@ -87,6 +134,41 @@ Handle Stripe webhook events for subscription management.
 ```
 
 ## Admin Endpoints
+
+### POST /api/admin/create-admin
+Create an initial admin user using credentials from environment variables.
+
+**Request Body:**
+None - uses ADMIN_EMAIL and ADMIN_PASSWORD from environment variables.
+
+**Response (Success):**
+```json
+{
+  "success": true,
+  "message": "Admin user created successfully",
+  "user": {
+    "id": "cuid123",
+    "email": "admin@example.com",
+    "isAdmin": true,
+    "createdAt": "2026-02-11T18:00:00.000Z"
+  }
+}
+```
+
+**Response (Already Exists):**
+```json
+{
+  "error": "Admin user already exists",
+  "email": "admin@example.com"
+}
+```
+
+**Status Codes:**
+- `201`: Admin created successfully
+- `400`: Missing environment variables
+- `405`: Method not allowed (only POST)
+- `409`: Admin already exists
+- `500`: Server error
 
 ### POST /api/admin/override
 Allows admins to override subscription quotas and periods.

@@ -5,6 +5,11 @@ import { getSession } from 'next-auth/react';
 import { prisma } from '../../lib/prisma';
 import { checkQuota } from '../../lib/billingQuota';
 import { createAIService } from '../../lib/aiService';
+import { 
+  InvalidResponseError, 
+  ServiceUnavailableError, 
+  ConfigurationError 
+} from '../../lib/aiServiceErrors';
 
 interface AssistantRequest {
   prompt: string;
@@ -65,12 +70,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     } catch (error: any) {
       console.error('AI generation error:', error);
       
-      // Provide more specific error messages based on error type
-      if (error.message?.includes('Invalid response structure')) {
+      // Use instanceof to check error types for robust error handling
+      if (error instanceof InvalidResponseError) {
         return res.status(502).json({ error: 'AI service returned invalid response' });
-      } else if (error.message?.includes('Failed to generate response')) {
+      } else if (error instanceof ServiceUnavailableError) {
         return res.status(502).json({ error: 'AI service is temporarily unavailable' });
-      } else if (error.message?.includes('API_KEY')) {
+      } else if (error instanceof ConfigurationError) {
         return res.status(500).json({ error: 'AI service configuration error' });
       }
       

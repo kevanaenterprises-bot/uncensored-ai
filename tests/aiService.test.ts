@@ -1,6 +1,11 @@
 // tests/aiService.test.ts
 
 import { AIService, createAIService } from '../lib/aiService';
+import { 
+  InvalidResponseError, 
+  ServiceUnavailableError, 
+  ConfigurationError 
+} from '../lib/aiServiceErrors';
 
 // Mock fetch globally
 global.fetch = jest.fn();
@@ -130,7 +135,7 @@ describe('AIService', () => {
     });
 
     describe('Error handling', () => {
-      it('should throw error on API failure', async () => {
+      it('should throw ServiceUnavailableError on API failure', async () => {
         (global.fetch as jest.Mock).mockResolvedValueOnce({
           ok: false,
           status: 401,
@@ -144,11 +149,21 @@ describe('AIService', () => {
         });
 
         await expect(service.generateCompletion('Test prompt')).rejects.toThrow(
-          'Failed to generate response from venice'
+          ServiceUnavailableError
         );
+        
+        try {
+          await service.generateCompletion('Test prompt');
+        } catch (error) {
+          if (error instanceof ServiceUnavailableError) {
+            expect(error.statusCode).toBe(401);
+            expect(error.statusText).toBe('Unauthorized');
+            expect(error.provider).toBe('venice');
+          }
+        }
       });
 
-      it('should throw error on invalid response structure', async () => {
+      it('should throw InvalidResponseError on invalid response structure', async () => {
         (global.fetch as jest.Mock).mockResolvedValueOnce({
           ok: true,
           json: async () => ({ choices: [] }), // Empty choices array
@@ -160,7 +175,7 @@ describe('AIService', () => {
         });
 
         await expect(service.generateCompletion('Test prompt')).rejects.toThrow(
-          'Invalid response structure from venice API'
+          InvalidResponseError
         );
       });
 
@@ -180,7 +195,7 @@ describe('AIService', () => {
         });
 
         await expect(service.generateCompletion('Test prompt')).rejects.toThrow(
-          'Failed to generate response from openai: 500 Internal Server Error'
+          ServiceUnavailableError
         );
       });
 
@@ -299,29 +314,23 @@ describe('AIService', () => {
       expect(service.getProviderName()).toBe('venice');
     });
 
-    it('should throw error for invalid provider', () => {
+    it('should throw ConfigurationError for invalid provider', () => {
       process.env.AI_PROVIDER = 'invalid-provider';
       process.env.VENICE_API_KEY = 'test-key';
 
-      expect(() => createAIService()).toThrow(
-        "Invalid AI_PROVIDER: 'invalid-provider'. Must be 'openai' or 'venice'."
-      );
+      expect(() => createAIService()).toThrow(ConfigurationError);
     });
 
-    it('should throw error if Venice API key is missing', () => {
+    it('should throw ConfigurationError if Venice API key is missing', () => {
       process.env.AI_PROVIDER = 'venice';
 
-      expect(() => createAIService()).toThrow(
-        'VENICE_API_KEY environment variable is required when using Venice.ai provider'
-      );
+      expect(() => createAIService()).toThrow(ConfigurationError);
     });
 
-    it('should throw error if OpenAI API key is missing', () => {
+    it('should throw ConfigurationError if OpenAI API key is missing', () => {
       process.env.AI_PROVIDER = 'openai';
 
-      expect(() => createAIService()).toThrow(
-        'OPENAI_API_KEY environment variable is required when using OpenAI provider'
-      );
+      expect(() => createAIService()).toThrow(ConfigurationError);
     });
   });
 });

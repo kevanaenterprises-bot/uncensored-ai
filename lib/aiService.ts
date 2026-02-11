@@ -1,5 +1,11 @@
 // lib/aiService.ts
 
+import { 
+  InvalidResponseError, 
+  ServiceUnavailableError, 
+  ConfigurationError 
+} from './aiServiceErrors';
+
 interface AIMessage {
   role: 'system' | 'user' | 'assistant';
   content: string;
@@ -67,12 +73,12 @@ export class AIService {
         let errorData;
         try {
           errorData = await response.json();
-        } catch (parseError) {
-          console.error(`Failed to parse error response from ${this.provider}:`, parseError);
+        } catch (jsonParseError) {
+          console.error(`Failed to parse error response from ${this.provider}:`, jsonParseError);
           errorData = { status: response.status, statusText: response.statusText };
         }
         console.error(`${this.provider} API error:`, errorData);
-        throw new Error(`Failed to generate response from ${this.provider}: ${response.status} ${response.statusText}`);
+        throw new ServiceUnavailableError(this.provider, response.status, response.statusText);
       }
 
       const data = await response.json();
@@ -80,7 +86,7 @@ export class AIService {
       // Validate response structure
       if (!data.choices || !Array.isArray(data.choices) || data.choices.length === 0) {
         console.error(`Invalid response structure from ${this.provider}:`, data);
-        throw new Error(`Invalid response structure from ${this.provider} API`);
+        throw new InvalidResponseError(this.provider, 'Missing or empty choices array');
       }
       
       const content = data.choices[0]?.message?.content || '';
@@ -111,7 +117,7 @@ export function createAIService(): AIService {
   
   // Validate provider value
   if (providerEnv !== 'openai' && providerEnv !== 'venice') {
-    throw new Error(`Invalid AI_PROVIDER: '${providerEnv}'. Must be 'openai' or 'venice'.`);
+    throw new ConfigurationError(`Invalid AI_PROVIDER: '${providerEnv}'. Must be 'openai' or 'venice'.`);
   }
   
   const provider = providerEnv as 'openai' | 'venice';
@@ -124,13 +130,13 @@ export function createAIService(): AIService {
     model = process.env.VENICE_MODEL;
     
     if (!apiKey) {
-      throw new Error('VENICE_API_KEY environment variable is required when using Venice.ai provider');
+      throw new ConfigurationError('VENICE_API_KEY environment variable is required when using Venice.ai provider');
     }
   } else {
     apiKey = process.env.OPENAI_API_KEY || '';
     
     if (!apiKey) {
-      throw new Error('OPENAI_API_KEY environment variable is required when using OpenAI provider');
+      throw new ConfigurationError('OPENAI_API_KEY environment variable is required when using OpenAI provider');
     }
   }
 

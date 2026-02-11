@@ -48,10 +48,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     const priceId = PRICE_IDS[tier];
 
-    if (!priceId) {
-      return res.status(400).json({ error: 'Invalid pricing tier' });
-    }
-
     // Warn if using placeholder IDs
     // Real Stripe price IDs follow the pattern: price_<24+ alphanumeric characters>
     // Placeholder IDs are just: price_<descriptive_name>

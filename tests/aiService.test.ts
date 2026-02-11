@@ -33,7 +33,7 @@ describe('AIService', () => {
         expect(service.getModel()).toBe('llama-3.3-70b');
       });
 
-      it('should use default model if not specified', () => {
+      it('should use VENICE_MODEL environment variable when model not specified in config', () => {
         process.env.VENICE_MODEL = 'llama-3.2-3b';
         const service = new AIService({
           provider: 'venice',
@@ -41,6 +41,16 @@ describe('AIService', () => {
         });
 
         expect(service.getModel()).toBe('llama-3.2-3b');
+      });
+
+      it('should use llama-3.3-70b as default when neither config nor env model specified', () => {
+        delete process.env.VENICE_MODEL;
+        const service = new AIService({
+          provider: 'venice',
+          apiKey: 'test-venice-key',
+        });
+
+        expect(service.getModel()).toBe('llama-3.3-70b');
       });
 
       it('should successfully generate completion with Venice.ai', async () => {

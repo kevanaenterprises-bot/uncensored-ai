@@ -97,7 +97,11 @@ export class AIService {
         tokensUsed,
       };
     } catch (error) {
-      console.error(`AI Service error (${this.provider}):`, error);
+      // Only log and re-throw unexpected errors that aren't our custom types
+      if (!(error instanceof InvalidResponseError) && 
+          !(error instanceof ServiceUnavailableError)) {
+        console.error(`Unexpected AI Service error (${this.provider}):`, error);
+      }
       throw error;
     }
   }

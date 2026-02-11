@@ -57,6 +57,8 @@ Configure the provider using the `AI_PROVIDER` environment variable.
 }
 ```
 
+> **Note**: The response now includes `provider` and `model` fields to indicate which AI service generated the response. These fields were added in the Venice.ai integration update.
+
 **Response (Quota Exceeded):**
 ```json
 {

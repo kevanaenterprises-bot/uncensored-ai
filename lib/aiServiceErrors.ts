@@ -4,6 +4,7 @@ export class AIServiceError extends Error {
   constructor(message: string, public provider: string) {
     super(message);
     this.name = 'AIServiceError';
+    Object.setPrototypeOf(this, new.target.prototype);
   }
 }
 
@@ -16,6 +17,7 @@ export class InvalidResponseError extends AIServiceError {
       provider
     );
     this.name = 'InvalidResponseError';
+    Object.setPrototypeOf(this, new.target.prototype);
   }
 }
 
@@ -26,6 +28,7 @@ export class ServiceUnavailableError extends AIServiceError {
       provider
     );
     this.name = 'ServiceUnavailableError';
+    Object.setPrototypeOf(this, new.target.prototype);
   }
 }
 
@@ -33,5 +36,6 @@ export class ConfigurationError extends AIServiceError {
   constructor(message: string) {
     super(message, 'configuration');
     this.name = 'ConfigurationError';
+    Object.setPrototypeOf(this, new.target.prototype);
   }
 }

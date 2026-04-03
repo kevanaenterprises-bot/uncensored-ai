@@ -7,14 +7,16 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint . --ext .ts,.tsx",
-    "test": "jest"
+    "test": "jest",
+    "docker:build": "docker build -t uncensored-ai .",
+    "postinstall": "prisma generate"
   },
   "dependencies": {
     "next": "latest",
     "react": "latest",
     "react-dom": "latest",
     "tailwindcss": "latest",
-    "@prisma/client": "latest",
+    "@prisma/client": "^5.0.0",
     "next-auth": "latest",
     "stripe": "latest",
     "pg": "latest",
@@ -35,6 +37,7 @@
     "@typescript-eslint/parser": "latest",
     "@typescript-eslint/eslint-plugin": "latest",
     "@types/bcryptjs": "^2.4.6",
-    "prettier": "latest"
+    "prettier": "latest",
+    "prisma": "^5.0.0"
   }
 }

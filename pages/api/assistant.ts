@@ -3,7 +3,7 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { getSession } from 'next-auth/react';
 import { prisma } from '../../lib/prisma';
-import { checkQuota, updateUsage } from '../../lib/billingQuota';
+import { checkQuota } from '../../lib/billingQuota';
 
 interface AssistantRequest {
   prompt: string;
